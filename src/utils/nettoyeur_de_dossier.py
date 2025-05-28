@@ -9,6 +9,9 @@ def clean_datasets(base_dir="datasets"):
             if os.path.isdir(path):
                 shutil.rmtree(path)
                 print("deleted:", entry)
+            elif os.path.isfile(path):
+                os.remove(path)
+                print("deleted file:", entry)
 
 def clean_build(base_dir="build"):
     """Remove all subdirectories and files in build"""

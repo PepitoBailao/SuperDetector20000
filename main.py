@@ -10,129 +10,119 @@ from src.utils.parser import parse_juliet_to_csv
 
 def print_header():
     """Print welcome header"""
-    print("="*60)
-    print("SuperDetector20000 - CWE Detection System")
-    print("AI-powered vulnerability detection for C/C++ code")
-    print("="*60)
+    print("="*50)
+    print("SuperDetector20000 - CWE Detection")
+    print("="*50)
 
 def print_step(step_num, total_steps, description):
     """Print current step"""
     print(f"\n[{step_num}/{total_steps}] {description}")
-    print("-" * 50)
+    print("-" * 30)
 
 def setup_dataset():
     """Setup Juliet dataset"""
-    print_step(1, 4, "Setting up Juliet dataset")
+    print_step(1, 4, "Setup dataset")
     
     if check_dataset_exists():
-        print("Dataset already exists at: datasets/juliet/extracted")
+        print("Dataset found")
         return True
     else:
-        print("Downloading Juliet dataset (this may take a while)...")
+        print("Downloading dataset...")
         try:
             extracted_path = download_and_extract()
-            print(f"Dataset ready at: {extracted_path}")
+            print(f"Dataset ready: {extracted_path}")
             return True
         except Exception as e:
-            print(f"Error downloading dataset: {e}")
+            print(f"Download failed: {e}")
             return False
 
 def parse_dataset():
     """Parse dataset to CSV"""
-    print_step(2, 4, "Parsing dataset to CSV")
+    print_step(2, 4, "Parse dataset")
     
     csv_path = "datasets/juliet_cwe_dataset.csv"
     
     if os.path.exists(csv_path):
-        print(f"CSV already exists at: {csv_path}")
+        print("CSV found")
         return True
     
     root_dir = "datasets/juliet/extracted/C/testcases"
     if not os.path.exists(root_dir):
-        print(f"Testcases directory not found: {root_dir}")
+        print(f"Missing: {root_dir}")
         return False
     
     try:
-        print("Parsing C/C++ files...")
+        print("Processing files...")
         parse_juliet_to_csv(root_dir, csv_path)
-        print(f"CSV dataset created: {csv_path}")
+        print("CSV created")
         return True
     except Exception as e:
-        print(f"Error parsing dataset: {e}")
+        print(f"Parse failed: {e}")
         return False
 
 def train_model():
     """Train the CWE detection model"""
-    print_step(3, 4, "Training CWE detection model")
+    print_step(3, 4, "Train model")
     
     model_path = "build/simple/cwe_model.pkl"
     
     if os.path.exists(model_path):
-        print(f"Model already exists at: {model_path}")
-        print("To retrain, delete the model file and run again.")
+        print("Model found")
         return True
     
     try:
-        # Import here to avoid issues if dependencies missing
         from src.simple.classifier import SimpleCWEClassifier
         import pandas as pd
         
         csv_path = "datasets/juliet_cwe_dataset.csv"
         if not os.path.exists(csv_path):
-            print(f"CSV dataset not found: {csv_path}")
+            print("CSV not found")
             return False
         
-        print("Loading dataset...")
+        print("Training...")
         model = SimpleCWEClassifier(max_features=5000)
         model.train_from_csv(csv_path, test_size=0.2)
         
-        print("Saving model...")
+        print("Saving...")
         model.save(model_path)
-        print(f"Model trained and saved to: {model_path}")
+        print("Model saved")
         return True
         
     except Exception as e:
-        print(f"Error training model: {e}")
+        print(f"Training failed: {e}")
         return False
 
 def show_usage():
     """Show usage instructions"""
-    print_step(4, 4, "Setup Complete!")
+    print_step(4, 4, "Complete")
     
-    print("Your CWE detection system is ready!")
-    print("\nUsage Instructions:")
-    print("-" * 30)
-    print("Detect CWE in a file:")
-    print("   python src/simple/detect.py your_code.c")
+    print("System ready!")
+    print("\nUsage:")
+    print("  python src/simple/detect.py file.c")
     print()
-    print("Example files to test:")
-    print("   python src/simple/detect.py datasets/juliet/extracted/C/testcases/CWE121_Stack_Based_Buffer_Overflow/s01/CWE121_Stack_Based_Buffer_Overflow__CWE805_char_declare_memcpy_01_bad.c")
-    print()
-    print("Advanced options:")
-    print("   - Retrain model: Delete build/simple/cwe_model.pkl and run main.py again")
-    print("   - Multi-label detection: Use src/multilabel/ scripts")
-    print()
-    print("For more info, check README.md")
+    print("Options:")
+    print("  - Retrain: Delete build/simple/cwe_model.pkl")
+    print("  - Clean all: python src/utils/nettoyeur_de_dossier.py")
 
 def main():
-    """Main orchestrator function"""
+    """Main function"""
     start_time = time.time()
     
     print_header()
     
     # Step 1: Setup dataset
     if not setup_dataset():
-        print("\nFailed to setup dataset. Exiting.")
+        print("\nSetup failed")
         sys.exit(1)
     
     # Step 2: Parse dataset  
     if not parse_dataset():
-        print("\nFailed to parse dataset. Exiting.")
+        print("\nParse failed")
         sys.exit(1)
     
     # Step 3: Train model
     if not train_model():
-        print("\nFailed to train model. Exiting.")
+        print("\nTraining failed")
         sys.exit(1)
     
     # Step 4: Show usage
@@ -140,15 +130,15 @@ def main():
     
     # Summary
     elapsed_time = time.time() - start_time
-    print(f"\nTotal setup time: {elapsed_time:.1f} seconds")
-    print("SuperDetector20000 is ready to detect vulnerabilities!")
+    print(f"\nTime: {elapsed_time:.1f}s")
+    print("Ready!")
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n\nSetup interrupted by user.")
+        print("\nStopped by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\nUnexpected error: {e}")
+        print(f"\nError: {e}")
         sys.exit(1)
