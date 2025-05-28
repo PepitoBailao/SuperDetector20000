@@ -1,30 +1,37 @@
-class CWEAnalyzer:
-    def __init__(self):
-        self.data = None
-        self.model = None
+import os
+import joblib
+from src.utils.nettoyage import nettoyer_code
+from src.utils.dataset import collect_code_samples
+from src.models.classifier import build_model
 
-    def load_data(self, file_path):
-        import pandas as pd
-        self.data = pd.read_csv(file_path)
+MODEL_PATH = "build/cwe_model.pkl"
 
-    def preprocess_data(self):
-        # Implement preprocessing steps such as cleaning and feature extraction
-        from utils.helpers import clean_code, extract_features
-        
-        self.data['cleaned_code'] = self.data['code'].apply(clean_code)
-        self.data['features'] = self.data['cleaned_code'].apply(extract_features)
+def train_if_needed():
+    if os.path.exists(MODEL_PATH):
+        print("[INFO] Chargement du modèle existant...")
+        model = joblib.load(MODEL_PATH)
+    else:
+        print("[INFO] Entraînement du modèle...")
+        data = collect_code_samples("datasets/juliet/extracted")
+        codes, labels = zip(*data)
+        codes = [nettoyer_code(c) for c in codes]
 
-    def train_model(self):
-        from models.classifier import Classifier
-        
-        features = self.data['features'].tolist()
-        labels = self.data['cwe_labels'].tolist()
-        
-        self.model = Classifier()
-        self.model.train(features, labels)
+        model = build_model()
+        model.fit(codes, labels)
 
-    def detect_cwe(self, code_input):
-        features = extract_features(clean_code(code_input))
-        return self.model.predict(features)
-    
-#testssss
+        os.makedirs("build", exist_ok=True)
+        joblib.dump(model, MODEL_PATH)
+        print("[INFO] Modèle entraîné et sauvegardé.")
+    return model
+
+def predict_file(file_path):
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"Fichier introuvable : {file_path}")
+
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        raw_code = f.read()
+
+    cleaned_code = nettoyer_code(raw_code)
+    model = train_if_needed()
+    prediction = model.predict([cleaned_code])
+    return prediction[0]
