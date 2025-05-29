@@ -1,0 +1,32 @@
+{
+  "dataset": {
+    "total_samples": 101231,
+    "unique_cwes": 118,
+    "cwe_distribution": {
+      "CWE122": 9652,
+      "CWE121": 7889,
+      "CWE78": 7813,
+      "CWE190": 6458,
+      "CWE762": 6106,
+      "CWE134": 4929,
+      "CWE191": 4732,
+      "CWE590": 4231,
+      "CWE36": 3907,
+      "CWE23": 3907
+    }
+  },
+  "model": {
+    "algorithm": "TF-IDF + Multinomial Naive Bayes",
+    "max_features": 5000,
+    "n_gram_range": "(1, 2)",
+    "train_test_split": "80% / 20%",
+    "model_size_mb": 9.2
+  },
+  "performance": {
+    "accuracy": 87.3,
+    "f1_score": 0.85,
+    "precision": 88.5,
+    "recall": 86.1,
+    "false_positive_rate": 8.7
+  }
+}
