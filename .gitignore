@@ -1,9 +1,13 @@
 datasets/
 src/__pycache__/
 .venv/
-test.c
 build/
 utils/__pycache__/
 src/simple/__pycache__/__init__.cpython-312.pyc
 src/simple/__pycache__/classifier.cpython-312.pyc
 stats/stat.json
+test.c
+test2.py
+test3.c
+test4.html
+model_statistics.json
