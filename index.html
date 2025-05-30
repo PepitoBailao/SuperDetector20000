@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperDetector20000 - Performance Analysis</title>
+    <link rel="icon" href="https://cdn-icons-mp4.flaticon.com/512/6172/6172533.mp4" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box }
+        body { font-family:Arial,sans-serif; background:#f8f9fa; color:#2c3e50; line-height:1.6 }
+        .container { max-width:1200px; margin:0 auto; padding:40px 20px }
+        header { text-align:center; margin-bottom:50px; padding-bottom:20px; border-bottom:2px solid #e9ecef }
+        h1 { font-size:2.5rem; font-weight:300; margin-bottom:10px }
+        .subtitle { font-size:1.1rem; color:#6c757d; font-weight:400 }
+        .data-source { background:#e3f2fd; border-left:4px solid #2196f3; padding:15px; margin:20px 0; border-radius:4px }
+        .download-link { margin-top:20px; text-align:center }
+        .download-link a {
+            display:inline-block; padding:10px 20px; background:#6721f3; color:#fff;
+            border-radius:4px; text-decoration:none; font-weight:600
+        }
+        .metrics-section { margin-bottom:50px }
+        .section-title {
+            font-size:1.5rem; font-weight:600; color:#2c3e50;
+            margin-bottom:30px; padding-bottom:10px; border-bottom:1px solid #e9ecef
+        }
+        .metrics-grid {
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+            gap:30px; margin-bottom:40px
+        }
+        .metric-card {
+            background:#fff; border:1px solid #e9ecef; border-radius:4px;
+            padding:30px 25px; text-align:center
+        }
+        .metric-value { font-size:2.8rem; font-weight:700; margin-bottom:8px }
+        .metric-label { font-size:0.95rem; color:#6c757d; text-transform:uppercase; letter-spacing:0.5px }
+        .charts-grid {
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
+            gap:30px; margin-bottom:40px
+        }
+        .chart-container {
+            background:#fff; border:1px solid #e9ecef; border-radius:4px;
+            padding:30px; height:400px
+        }
+        .chart-title {
+            font-size:1.2rem; font-weight:600; margin-bottom:20px; text-align:center
+        }
+        .performance-table {
+            background:#fff; border:1px solid #e9ecef; border-radius:4px;
+            margin-bottom:40px; overflow:hidden
+        }
+        table { width:100%; border-collapse:collapse }
+        th {
+            background:#f8f9fa; padding:15px 20px; text-align:left; font-weight:600;
+            color:#495057; border-bottom:1px solid #e9ecef; font-size:0.9rem;
+            text-transform:uppercase; letter-spacing:0.5px
+        }
+        td { padding:15px 20px; border-bottom:1px solid #f8f9fa; font-size:0.95rem }
+        tr:last-child td { border-bottom:none }
+        .specifications {
+            background:#fff; border:1px solid #e9ecef; border-radius:4px; padding:30px
+        }
+        .spec-grid {
+            display:grid; grid-template-columns:1fr 2fr; gap:15px 40px; align-items:center
+        }
+        .spec-label { font-weight:600; color:#495057; font-size:0.9rem }
+        .spec-value { color:#2c3e50; font-family:'Courier New',monospace; font-size:0.9rem }
+        footer {
+            text-align:center; margin-top:60px; padding-top:30px;
+            border-top:1px solid #e9ecef; color:#6c757d; font-size:0.9rem
+        }
+        @media (max-width:768px) {
+            .spec-grid { grid-template-columns:1fr; gap:10px }
+            .metrics-grid, .charts-grid { grid-template-columns:1fr; gap:20px }
+            .chart-container { min-width:300px }
+            h1 { font-size:2rem }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SuperDetector20000</h1>
+            <p class="subtitle">CWE Detection System - Performance Analysis Report</p>
+            <div class="data-source" id="data-source-info"></div>
+            <div class="download-link">
+                <a href="build/simple/cwe_model.pkl" download>
+                    Télécharger le dernier modèle (.pkl)
+                </a>
+            </div>
+        </header>
+
+        <div class="metrics-section">
+            <h2 class="section-title">Key Performance Indicators</h2>
+            <div class="metrics-grid" id="kpi-grid"></div>
+        </div>
+
+        <div class="metrics-section">
+            <h2 class="section-title">Performance Visualization</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-title">CWE Distribution by Samples</div>
+                    <canvas id="cweDistributionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Model Performance Overview</div>
+                    <canvas id="overviewChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="metrics-section">
+            <h2 class="section-title">Top CWE Types</h2>
+            <div class="performance-table">
+                <table id="cwe-table">
+                    <thead>
+                        <tr><th>CWE ID</th><th>Samples</th><th>Percentage</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="metrics-section">
+            <h2 class="section-title">Model Specifications</h2>
+            <div class="specifications">
+                <div class="spec-grid" id="model-specs"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>SuperDetector20000 - Automated Vulnerability Detection System</p>
+            <p>Trained on NIST Juliet Test Suite for C/C++ vulnerability detection</p>
+        </footer>
+    </div>
+
+    <script>
+        let statsData = null;
+        let isRealData = false;
+
+        async function loadStatistics() {
+            try {
+                const res = await fetch('stats/model_statistics.json');
+                if (!res.ok) throw new Error('Fichier de statistiques introuvable');
+                statsData = await res.json();
+                isRealData = true;
+            } catch {
+                statsData = getDefaultStats();
+                isRealData = false;
+            }
+            updateDataSourceInfo();
+            populateKPIs();
+            populateTable();
+            populateSpecs();
+            createCharts();
+        }
+
+        function updateDataSourceInfo() {
+            const el = document.getElementById('data-source-info');
+            if (isRealData) {
+                const date = new Date(statsData.generated_at).toLocaleString('fr-FR');
+                el.innerHTML = `<strong>Données réelles</strong> – Générées le ${date}`;
+                el.style.background = '#e8f5e8';
+                el.style.borderColor = '#4caf50';
+            } else {
+                el.innerHTML = `<strong>Données d'exemple</strong> – Statistiques non disponibles`;
+                el.style.background = '#fff3cd';
+                el.style.borderColor = '#ffc107';
+            }
+        }
+
+        function getDefaultStats() {
+            return {
+                generated_at: new Date().toISOString(),
+                dataset: {
+                    total_samples: 101231,
+                    unique_cwes: 118,
+                    cwe_distribution: {
+                        CWE122:9652,CWE121:7889,CWE78:7813,CWE190:6458,CWE762:6106,
+                        CWE134:4929,CWE191:4732,CWE590:4231,CWE36:3907,CWE23:3907
+                    },
+                    most_common_cwe:'CWE122',
+                    avg_code_length:1778
+                },
+                model: {
+                    algorithm:'TF-IDF + Multinomial Naive Bayes',
+                    max_features:5000,
+                    n_gram_range:'(1, 2)',
+                    train_test_split:'80% / 20%',
+                    model_size_mb:0.9
+                },
+                performance:{
+                    accuracy:87.3,
+                    precision:88.5,
+                    recall:86.1,
+                    f1_score:0.85,
+                    false_positive_rate:8.7
+                }
+            };
+        }
+
+        function populateKPIs() {
+            const p = statsData.performance;
+            const d = statsData.dataset;
+            const m = statsData.model;
+            const items = [
+                { value: `${p.accuracy}%`, label:'Overall Accuracy' },
+                { value: d.total_samples.toLocaleString(), label:'Training Samples' },
+                { value: d.unique_cwes, label:'CWE Types Detected' },
+                { value: `${p.f1_score}`, label:'F1-Score' },
+                { value: `${p.false_positive_rate}%`, label:'False Positive Rate' },
+                { value: `${m.model_size_mb} MB`, label:'Model Size' }
+            ];
+            document.getElementById('kpi-grid').innerHTML =
+                items.map(i=>`<div class="metric-card"><div class="metric-value">${i.value}</div><div class="metric-label">${i.label}</div></div>`).join('');
+        }
+
+        function populateTable() {
+            const dist = statsData.dataset.cwe_distribution;
+            const total = statsData.dataset.total_samples;
+            const rows = Object.entries(dist).map(([c,count])=>({
+                cwe:c,
+                count,
+                pct:((count/total)*100).toFixed(1)
+            }));
+            document.querySelector('#cwe-table tbody').innerHTML =
+                rows.map(r=>`<tr><td>${r.cwe}</td><td>${r.count.toLocaleString()}</td><td>${r.pct}%</td></tr>`).join('');
+        }
+
+        function populateSpecs() {
+            const m = statsData.model;
+            const d = statsData.dataset;
+            const specs = [
+                ['Algorithm', m.algorithm],
+                ['Max Features', m.max_features],
+                ['N-gram Range', m.n_gram_range],
+                ['Train/Test Split', m.train_test_split],
+                ['Model Size', `${m.model_size_mb} MB`],
+                ['Dataset Source', 'NIST Juliet Test Suite v1.3'],
+                ['Total Samples', d.total_samples.toLocaleString()],
+                ['Most Common CWE', d.most_common_cwe],
+                ['Avg Code Length', `${d.avg_code_length} chars`]
+            ];
+            document.getElementById('model-specs').innerHTML =
+                specs.map(([l,v])=>`<div class="spec-label">${l}</div><div class="spec-value">${v}</div>`).join('');
+        }
+
+        function createCharts() {
+            const colors = ['#28a745','#17a2b8','#ffc107','#fd7e14','#dc3545','#6f42c1','#20c997','#6610f2','#e83e8c','#fd7e14'];
+            const dist = statsData.dataset.cwe_distribution;
+            new Chart(document.getElementById('cweDistributionChart').getContext('2d'), {
+                type:'doughnut',
+                data:{
+                    labels:Object.keys(dist),
+                    datasets:[{ data:Object.values(dist), backgroundColor:colors, borderColor:'#fff', borderWidth:2 }]
+                },
+                options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+            });
+
+            const p = statsData.performance;
+            new Chart(document.getElementById('overviewChart').getContext('2d'), {
+                type:'line',
+                data:{
+                    labels:['Accuracy','Precision','Recall','F1-Score'],
+                    datasets:[{
+                        label:'% Performance',
+                        data:[p.accuracy, p.precision, p.recall, p.f1_score*100],
+                        borderColor:'#2c3e50', backgroundColor:'rgba(44,62,80,0.1)',
+                        borderWidth:3, fill:true, tension:0.4,
+                        pointBackgroundColor:'#2c3e50', pointBorderColor:'#fff', pointBorderWidth:2, pointRadius:6
+                    }]
+                },
+                options:{
+                    responsive:true, maintainAspectRatio:false,
+                    scales:{ y:{ beginAtZero:true, max:100, ticks:{ callback:v=>v+'%' } } },
+                    plugins:{ legend:{ display:false } }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadStatistics);
+    </script>
+</body>
+</html>
