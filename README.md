@@ -10,9 +10,13 @@
 - `cleaner.py` ; permet de supprimer tous les fichier dans dataset pour les tests
 - `helper.py` : fonction utilitaires partagées
 
+## Page de stats
+https://pepitobailao.github.io/SuperDetector20000/
+
 ## Utilisation
 
 1. **Installer les dépendances**
 
 ```bash
 pip install -r requirements.txt
+
