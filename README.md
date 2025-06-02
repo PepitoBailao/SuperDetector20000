@@ -1,6 +1,6 @@
 # SuperDetector20000
 
-Détection automatique de vulnérabilités CWE dans du code C/C++.
+Automatic CWE vulnerability detection for C/C++ code.
 
 ## Installation
 
@@ -8,37 +8,68 @@ Détection automatique de vulnérabilités CWE dans du code C/C++.
 pip install -r requirements.txt
 ```
 
-## Utilisation
+## Usage
 
-1. **Lancer le programme principal :**
+1. **Run the main program:**
 ```bash
 python main.py
 ```
 
-2. **Suivre le pipeline automatique** (téléchargement dataset, entraînement, validation)
+2. **Follow the automatic pipeline** (dataset download, training, validation)
 
-3. **Choisir une option :**
-   - `1` : Menu de détection (tester des fichiers ou du code)
-   - `2` : Quitter
+3. **Choose an option:**
+   - `1` : Detection menu (test files or code snippets)
+   - `2` : Exit
 
-## Menu de détection
+## Detection Menu
 
-Une fois dans le menu de détection :
-- `1` : Tester un fichier C/C++
-- `2` : Tester un snippet de code (coller le code puis taper `end`)
-- `3` : Quitter
+Once in the detection menu:
+- `1` : Test a C/C++ file
+- `2` : Test a code snippet (paste code then type `END`)
+- `3` : Archive current model
+- `4` : Exit
 
-## Statistiques et performances
+## Statistics and Performance
 
-Consultez les métriques du modèle : https://pepitobailao.github.io/SuperDetector20000/
+View model metrics: https://pepitobailao.github.io/SuperDetector20000/
 
-## Structure du projet
+## Project Structure
 
 ```
 SuperDetector20000/
-├── main.py              # Point d'entrée principal
-├── src/simple/          # Code d'entraînement et détection
-├── datasets/            # Datasets de vulnérabilités
-├── build/simple/        # Modèles entraînés (.pkl)
-└── stats/               # Statistiques et métriques
+├── main.py              # Main entry point
+├── src/simple/          # Training and detection code
+├── datasets/            # Vulnerability datasets
+├── build/simple/        # Trained models (.pkl)
+└── stats/               # Statistics and metrics
+```
+
+## Features
+
+- **Automatic training** from Juliet Test Suite dataset
+- **Real-time detection** of CWE vulnerabilities
+- **Model archiving** with performance tracking
+- **Web dashboard** for statistics visualization
+- **Command-line interface** for easy testing
+
+## Model Performance
+
+Current model achieves:
+- **87.3%** accuracy on test set
+- **118** different CWE types supported
+- **100K+** training samples processed
+
+## Quick Start
+
+```bash
+# Clone and setup
+git clone https://github.com/pepitobailao/SuperDetector20000.git
+cd SuperDetector20000
+pip install -r requirements.txt
+
+# Run setup and training
+python main.py
+
+# Test a file
+# Choose option 1 in menu, then option 1 to test file
 ```
