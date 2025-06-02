@@ -1,0 +1,17 @@
+{
+  "generated_at": "2025-06-02T14:52:12.077978",
+  "total_archives": 1,
+  "archives": [
+    {
+      "name": "cwe_model_001_20250602_145131",
+      "generated_date": "2025-06-02",
+      "archived_date": "2025-06-02",
+      "accuracy": "88.5%",
+      "f1_score": 0.87,
+      "samples": "101,231",
+      "size": "4.9 MB",
+      "download_url": "../build/simple/archived/cwe_model_001_20250602_145131.pkl",
+      "model_available": true
+    }
+  ]
+}

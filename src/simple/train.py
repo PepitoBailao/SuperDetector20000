@@ -8,6 +8,7 @@ import joblib
 import os
 import numpy as np
 import re
+import glob
 
 class SimpleCWEClassifier:
     def __init__(self, max_features=100000, ngram_range=(1, 3), min_df=2, max_df=0.95):
@@ -56,10 +57,48 @@ class SimpleCWEClassifier:
     
     def save(self, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        joblib.dump(self, path, compress=3)
-    
+        
+        # Génère un nom de fichier avec numéro incrémental
+        base_path = os.path.splitext(path)[0]  # Sans extension
+        extension = os.path.splitext(path)[1]   # .pkl
+        
+        # Trouve le prochain numéro disponible
+        counter = 1
+        while True:
+            numbered_path = f"{base_path}_{counter:03d}{extension}"
+            if not os.path.exists(numbered_path):
+                break
+            counter += 1
+        
+        # Sauvegarde avec le numéro
+        joblib.dump(self, numbered_path, compress=3)
+        
+        # Crée aussi un lien symbolique vers la dernière version
+        latest_path = f"{base_path}_latest{extension}"
+        if os.path.exists(latest_path):
+            os.remove(latest_path)
+        
+        try:
+            os.symlink(os.path.basename(numbered_path), latest_path)
+        except OSError:
+            # Fallback pour systèmes sans support symlink
+            import shutil
+            shutil.copy2(numbered_path, latest_path)
+        
+        print(f"Modèle sauvegardé: {numbered_path}")
+        print(f"Lien vers dernière version: {latest_path}")
+        
+        return numbered_path
+
     @classmethod
     def load_model(cls, path):
+        # Si on demande le modèle de base, charge la dernière version
+        if not path.endswith('_latest.pkl') and not re.search(r'_\d{3}\.pkl$', path):
+            base_path = os.path.splitext(path)[0]
+            latest_path = f"{base_path}_latest.pkl"
+            if os.path.exists(latest_path):
+                path = latest_path
+        
         return joblib.load(path)
 
 def clean_code(code):
@@ -76,3 +115,19 @@ def read_file(file_path):
     
     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
         return f.read()
+
+if __name__ == "__main__":
+    print("Démarrage de l'entraînement...")
+    
+    csv_file = "datasets/juliet_cwe_dataset.csv"
+    model_path = "build/simple/cwe_model.pkl"
+    
+    if not os.path.exists(csv_file):
+        print(f"ERREUR: Dataset non trouvé à {csv_file}")
+        exit(1)
+    
+    classifier = SimpleCWEClassifier()
+    classifier.train_from_csv(csv_file)
+    saved_path = classifier.save(model_path)
+    
+    print(f"Entraînement terminé. Modèle sauvé: {saved_path}")

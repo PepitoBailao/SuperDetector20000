@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="image/jpg" href="stats/SD20000.gif"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box }
+        body { font-family:Arial,sans-serif; background:#f5f5f5; color:#333; line-height:1.6 }
+        .container { max-width:1000px; margin:0 auto; padding:20px }
+        header { text-align:center; margin-bottom:40px; padding-bottom:20px; border-bottom:2px solid #ddd }
+        h1 { font-size:2.2rem; margin-bottom:10px }
+        .subtitle { color:#666; margin-bottom:20px }
+        .nav { 
+            display:inline-block; margin:10px 5px; padding:8px 16px; 
+            background:#2196f3; color:white; border-radius:4px; text-decoration:none 
+        }
+        .section {
+            margin:40px 0 20px 0; padding-bottom:10px; border-bottom:1px solid #ddd;
+            font-size:1.4rem; font-weight:600
+        }
+        .grid {
+            display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+            gap:20px; margin-bottom:40px
+        }
+        .card {
+            background:white; border:1px solid #ddd; border-radius:4px;
+            padding:20px; transition:box-shadow 0.3s
+        }
+        .card:hover { box-shadow:0 4px 12px rgba(0,0,0,0.1) }
+        .card-name { font-weight:600; font-size:1.1rem; margin-bottom:15px }
+        .badge { 
+            display:inline-block; padding:4px 8px; border-radius:4px; font-size:0.8rem; 
+            font-weight:500; background:#e8f5e8; color:#2e7d32; margin-bottom:15px
+        }
+        .badge.latest { background:#e3f2fd; color:#1976d2 }
+        .badge.unavailable { background:#ffebee; color:#c62828 }
+        .row { display:flex; justify-content:space-between; margin:8px 0 }
+        .label { color:#666; font-size:0.9rem }
+        .value { font-weight:600; color:#333 }
+        .actions { margin-top:15px; padding-top:15px; border-top:1px solid #f0f0f0 }
+        .btn { 
+            display:inline-block; padding:8px 12px; margin:4px 4px 4px 0; border-radius:4px;
+            text-decoration:none; font-size:0.85rem; font-weight:500; color:white
+        }
+        .btn-primary { background:#2196f3 }
+        .btn-disabled { background:#666; cursor:not-allowed }
+        .chart { 
+            background:white; border:1px solid #ddd; border-radius:4px; 
+            padding:20px; height:350px; margin:20px 0 
+        }
+        .loading, .no-data { 
+            text-align:center; padding:40px; color:#666; background:white; 
+            border-radius:4px; margin:40px 0 
+        }
+        @media (max-width:768px) {
+            .grid { grid-template-columns:1fr }
+            h1 { font-size:2rem }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SuperDetector20000</h1>
+            <div>
+                <a href="../index.html" class="nav">Back</a>
+            </div>
+        </header>
+
+        <div id="loading" class="loading">
+            <h3>Loading data...</h3>
+        </div>
+
+        <div id="content" style="display:none">
+            <h2 class="section">Performance Evolution</h2>
+            <div class="chart">
+                <canvas id="chart"></canvas>
+            </div>
+
+            <h2 class="section">Available Models</h2>
+            <div class="grid" id="grid"></div>
+        </div>
+
+        <div id="no-data" class="no-data" style="display:none">
+            <h3>No models found</h3>
+            <p>Models will appear here after training.</p>
+        </div>
+    </div>
+
+    <script>
+        let archives = [];
+        let current = null;
+
+        async function loadData() {
+            try {
+                // Load archives
+                try {
+                    const res = await fetch('archives_index.json');
+                    if (res.ok) {
+                        const data = await res.json();
+                        archives = data.archives || [];
+                    }
+                } catch (e) {
+                    console.log('Archives not found, using demo data');
+                }
+
+                // Load current
+                try {
+                    const res = await fetch('../stats/model_statistics.json');
+                    if (res.ok) {
+                        current = await res.json();
+                    }
+                } catch (e) {
+                    console.log('Current stats not found, using demo data');
+                }
+
+                // Demo data if nothing found
+                if (archives.length === 0 && !current) {
+                    current = {
+                        generated_at: new Date().toISOString(),
+                        performance: { accuracy: 87.3, f1_score: 0.85, precision: 88.5, recall: 86.1 },
+                        dataset: { total_samples: 101231 }
+                    };
+
+                    archives = [
+                        {
+                            name: 'cwe_model_001_20250601_143022',
+                            generated_date: '2025-06-01',
+                            accuracy: '85.2%',
+                            f1_score: 0.82,
+                            samples: '98,450',
+                            size: '2.1 MB',
+                            download_url: '../build/simple/archived/cwe_model_001_20250601_143022.pkl',
+                            model_available: true
+                        },
+                        {
+                            name: 'cwe_model_002_20250602_091545',
+                            generated_date: '2025-06-02',
+                            accuracy: '86.1%',
+                            f1_score: 0.84,
+                            samples: '100,120',
+                            size: '2.0 MB',
+                            download_url: '../build/simple/archived/cwe_model_002_20250602_091545.pkl',
+                            model_available: false
+                        }
+                    ];
+                }
+
+                updateModels();
+                updateChart();
+                showContent();
+
+            } catch (error) {
+                console.error('Loading error:', error);
+                showNoData();
+            }
+        }
+
+        function showContent() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            document.getElementById('no-data').style.display = 'none';
+        }
+
+        function showNoData() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('no-data').style.display = 'block';
+        }
+
+        function updateModels() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+
+            // Current model
+            if (current) {
+                grid.innerHTML += `
+                    <div class="card">
+                        <div class="badge latest">CURRENT</div>
+                        <div class="card-name">cwe_model_latest</div>
+                        <div class="row">
+                            <span class="label">Accuracy</span>
+                            <span class="value">${current.performance.accuracy}%</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">F1-Score</span>
+                            <span class="value">${current.performance.f1_score}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Samples</span>
+                            <span class="value">${current.dataset.total_samples.toLocaleString()}</span>
+                        </div>
+                        <div class="actions">
+                            <a href="../build/simple/cwe_model_latest.pkl" download class="btn btn-primary">Download</a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Archived models
+            archives.forEach(model => {
+                const badgeClass = model.model_available ? '' : ' unavailable';
+                const badgeText = model.model_available ? 'ARCHIVED' : 'UNAVAILABLE';
+                const downloadBtn = model.model_available 
+                    ? `<a href="${model.download_url}" download class="btn btn-primary">Download</a>`
+                    : `<span class="btn btn-disabled">Unavailable</span>`;
+
+                grid.innerHTML += `
+                    <div class="card">
+                        <div class="badge${badgeClass}">${badgeText}</div>
+                        <div class="card-name">${model.name}</div>
+                        <div class="row">
+                            <span class="label">Accuracy</span>
+                            <span class="value">${model.accuracy}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">F1-Score</span>
+                            <span class="value">${model.f1_score}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Samples</span>
+                            <span class="value">${model.samples}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Date</span>
+                            <span class="value">${model.generated_date}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Size</span>
+                            <span class="value">${model.size}</span>
+                        </div>
+                        <div class="actions">
+                            ${downloadBtn}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('chart').getContext('2d');
+            
+            const data = [];
+            const labels = [];
+
+            // Add archived models
+            archives.forEach(model => {
+                labels.push(model.name.substring(10, 23)); // Extract date/time
+                data.push(parseFloat(model.accuracy));
+            });
+
+            // Add current model
+            if (current) {
+                labels.push('Current');
+                data.push(current.performance.accuracy);
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Accuracy (%)',
+                        data: data,
+                        borderColor: '#2196f3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { callback: v => v + '%' }
+                        }
+                    },
+                    plugins: {
+                        title: { display: true, text: 'Performance Evolution' },
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

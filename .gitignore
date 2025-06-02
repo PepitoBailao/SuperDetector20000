@@ -3,11 +3,9 @@ src/__pycache__/
 .venv/
 build/
 utils/__pycache__/
-src/simple/__pycache__/__init__.cpython-312.pyc
-src/simple/__pycache__/classifier.cpython-312.pyc
-stats/stat.json
+src/simple/__pycache__/
+stats/__pycache__/
 test.c
 test2.py
 test3.c
 test4.html
-model_statistics.json
