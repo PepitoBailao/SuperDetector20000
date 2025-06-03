@@ -4,7 +4,7 @@ src/__pycache__/
 build/
 utils/__pycache__/
 src/simple/__pycache__/
-stats/__pycache__/
+stats/
 test.c
 test2.py
 test3.c

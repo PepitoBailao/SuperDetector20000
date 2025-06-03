@@ -112,7 +112,7 @@
                             CWE134:4929, CWE191:4732, CWE590:4231, CWE36:3907, CWE23:3907
                         }
                     },
-                    performance: { accuracy:87.3, precision:88.5, recall:86.1, f1_score:0.85 }
+                    performance: { accuracy:87.3, precision:88.5, recall:86.1}
                 };
                 isReal = false;
             }
@@ -143,7 +143,6 @@
                 { value: `${p.accuracy}%`, label:'Accuracy' },
                 { value: d.total_samples.toLocaleString(), label:'Samples' },
                 { value: d.unique_cwes, label:'CWE Types' },
-                { value: `${p.f1_score}`, label:'F1-Score' }
             ];
             document.getElementById('metrics').innerHTML = metrics.map(m =>
                 `<div class="metric">
