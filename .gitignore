@@ -1,11 +1,7 @@
 datasets/
-src/__pycache__/
+src/utils/__pycache__/
+src/simple/__pycache__/
+stats/__pycache__/
 .venv/
 build/
-utils/__pycache__/
-src/simple/__pycache__/
-stats/
-test.c
-test2.py
-test3.c
-test4.html
+test/

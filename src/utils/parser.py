@@ -40,17 +40,14 @@ def parse_juliet_to_csv(root_dir, output_csv="datasets/juliet_cwe_dataset.csv"):
                     continue
                 
                 samples.append({
-                    'filename': filename,
-                    'filepath': filepath,
                     'cwe': cwe,
                     'code': cleaned_code
                 })
                     
-            except Exception:
+            except:
                 continue
     
     df = pd.DataFrame(samples)
     os.makedirs(os.path.dirname(output_csv), exist_ok=True)
     df.to_csv(output_csv, index=False, encoding='utf-8')
-    print(f"Parsed {len(df)} samples with {df['cwe'].nunique()} unique CWEs")
     return output_csv

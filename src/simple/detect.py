@@ -1,52 +1,91 @@
 import os
-import sys
+import shutil
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+def clean_datasets(base_dir="datasets"):
+    """Clean all datasets directory contents"""
+    if os.path.isdir(base_dir):
+        print(f"Cleaning {base_dir}...")
+        for entry in os.listdir(base_dir):
+            path = os.path.join(base_dir, entry)
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+                print(f"  Removed directory: {entry}")
+            elif os.path.isfile(path):
+                os.remove(path)
+                print(f"  Removed file: {entry}")
+        print(f"✓ {base_dir} cleaned")
+    else:
+        print(f"Directory {base_dir} does not exist")
 
-from src.simple.train import SimpleCWEClassifier, clean_code, read_file
+def clean_build(base_dir="build"):
+    """Clean all build directory contents"""
+    if os.path.isdir(base_dir):
+        print(f"Cleaning {base_dir}...")
+        for entry in os.listdir(base_dir):
+            path = os.path.join(base_dir, entry)
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+                print(f"  Removed directory: {entry}")
+            elif os.path.isfile(path):
+                os.remove(path)
+                print(f"  Removed file: {entry}")
+        print(f"✓ {base_dir} cleaned")
+    else:
+        print(f"Directory {base_dir} does not exist")
 
-MODEL_PATH = "build/simple/cwe_model.pkl"
+def clean_stats(base_dir="stats"):
+    """Clean generated statistics files but keep templates"""
+    if os.path.isdir(base_dir):
+        print(f"Cleaning {base_dir}...")
+        files_to_remove = [
+            "model_statistics.json",
+            "archived_stats"
+        ]
+        for entry in files_to_remove:
+            path = os.path.join(base_dir, entry)
+            if os.path.isfile(path):
+                os.remove(path)
+                print(f"  Removed file: {entry}")
+            elif os.path.isdir(path):
+                shutil.rmtree(path)
+                print(f"  Removed directory: {entry}")
+        print(f"✓ {base_dir} cleaned")
 
-def predict_file(file_path):
-    if not os.path.isfile(file_path):
-        raise FileNotFoundError(f"File not found: {file_path}")
+def clean_all():
+    """Clean all generated files and directories"""
+    print("=== Cleaning SuperDetector20000 ===")
+    clean_datasets()
+    clean_build()
+    clean_stats()
+    print("=== Cleanup completed ===")
+
+def selective_clean():
+    """Interactive cleanup menu"""
+    print("\n=== SuperDetector20000 Cleanup Menu ===")
+    print("1. Clean datasets only")
+    print("2. Clean build only")
+    print("3. Clean stats only")
+    print("4. Clean all")
+    print("5. Exit")
     
-    raw_code = read_file(file_path)
-    cleaned_code = clean_code(raw_code)
-    model = SimpleCWEClassifier.load_model(MODEL_PATH)
-    return model.predict([cleaned_code])[0]
-
-def predict_with_confidence(file_path):
-    raw_code = read_file(file_path)
-    cleaned_code = clean_code(raw_code)
-    model = SimpleCWEClassifier.load_model(MODEL_PATH)
+    choice = input("\nChoice (1-5): ").strip()
     
-    prediction = model.predict([cleaned_code])[0]
-    probabilities = model.predict_proba([cleaned_code])[0]
-    classes = model.pipeline.classes_
-    top_indices = probabilities.argsort()[-3:][::-1]
-    
-    results = [{'cwe': classes[i], 'confidence': probabilities[i]} for i in top_indices]
-    return prediction, results
+    if choice == "1":
+        clean_datasets()
+    elif choice == "2":
+        clean_build()
+    elif choice == "3":
+        clean_stats()
+    elif choice == "4":
+        clean_all()
+    elif choice == "5":
+        print("Cleanup cancelled")
+    else:
+        print("Invalid choice")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python detect.py <file.c>")
-        sys.exit(1)
-    
-    file_path = sys.argv[1]
-    try:
-        print(f"Analyzing: {file_path}")
-        cwe = predict_file(file_path)
-        print(f"Detected CWE: {cwe}")
-        
-        print("Top predictions:")
-        _, top_predictions = predict_with_confidence(file_path)
-        
-        for i, result in enumerate(top_predictions, 1):
-            confidence = result['confidence'] * 100
-            print(f"  {i}. {result['cwe']} - {confidence:.2f}%")
-            
-    except Exception as e:
-        print(f"ERROR: {e}")
-        sys.exit(1)
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "--interactive":
+        selective_clean()
+    else:
+        clean_all()

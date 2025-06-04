@@ -1,0 +1,40 @@
+{
+  "generated_at": "2025-06-03T21:43:37.096181",
+  "dataset": {
+    "total_samples": 101155,
+    "unique_cwes": 116,
+    "cwe_distribution": {
+      "CWE122": 9650,
+      "CWE121": 7887,
+      "CWE78": 7813,
+      "CWE190": 6451,
+      "CWE762": 6104,
+      "CWE134": 4929,
+      "CWE191": 4727,
+      "CWE590": 4229,
+      "CWE23": 3907,
+      "CWE36": 3907
+    },
+    "most_common_cwe": "CWE122",
+    "avg_code_length": 1716.9,
+    "min_code_length": 60,
+    "max_code_length": 292370
+  },
+  "model": {
+    "algorithm": "TF-IDF + Multinomial Naive Bayes",
+    "max_features": 100000,
+    "n_gram_range": "(1, 3)",
+    "train_test_split": "90% / 10%",
+    "model_size_mb": 183.9
+  },
+  "performance": {
+    "accuracy": 0.7710557532621589,
+    "f1_score": 0.7470784650694937,
+    "precision": 0.7852790365598257,
+    "recall": 0.7710557532621589,
+    "false_positive_rate": 99.2
+  },
+  "archived_at": "2025-06-04T09:40:05.899384",
+  "archive_number": 11,
+  "model_file_name": "cwe_model_011_20250604_094005.pkl"
+}
