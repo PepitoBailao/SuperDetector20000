@@ -420,7 +420,7 @@
     // Charger la base de données CWE
     async function loadCWEDatabase() {
         try {
-            const response = await fetch('data/cwe_database.json');
+            const response = await fetch('stats/cwe_analysis.json');
             if (response.ok) {
                 cweInfo = await response.json();
                 console.log('Base de données CWE chargée:', Object.keys(cweInfo).length, 'entrées');

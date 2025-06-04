@@ -1,6 +1,6 @@
 {
-  "generated_at": "2025-06-04T10:59:52.880609",
-  "total_archives": 14,
+  "generated_at": "2025-06-04T12:36:52.712289",
+  "total_archives": 18,
   "archives": [
     {
       "name": "cwe_model_001_20250602_145131",
@@ -154,6 +154,50 @@
       "samples": "134,189",
       "size": "186.7 MB",
       "download_url": "../build/simple/archived/cwe_model_014_20250604_105952.pkl",
+      "model_available": true
+    },
+    {
+      "name": "cwe_model_015_20250604_120429",
+      "generated_date": "2025-06-04",
+      "archived_date": "2025-06-04",
+      "accuracy": "79.6%",
+      "f1_score": 0.776,
+      "samples": "134,189",
+      "size": "186.7 MB",
+      "download_url": "../build/simple/archived/cwe_model_015_20250604_120429.pkl",
+      "model_available": true
+    },
+    {
+      "name": "cwe_model_016_20250604_121246",
+      "generated_date": "2025-06-04",
+      "archived_date": "2025-06-04",
+      "accuracy": "79.6%",
+      "f1_score": 0.776,
+      "samples": "134,189",
+      "size": "186.7 MB",
+      "download_url": "../build/simple/archived/cwe_model_016_20250604_121246.pkl",
+      "model_available": true
+    },
+    {
+      "name": "cwe_model_017_20250604_123201",
+      "generated_date": "2025-06-04",
+      "archived_date": "2025-06-04",
+      "accuracy": "79.6%",
+      "f1_score": 0.776,
+      "samples": "134,189",
+      "size": "186.7 MB",
+      "download_url": "../build/simple/archived/cwe_model_017_20250604_123201.pkl",
+      "model_available": true
+    },
+    {
+      "name": "cwe_model_018_20250604_123652",
+      "generated_date": "2025-06-04",
+      "archived_date": "2025-06-04",
+      "accuracy": "77.4%",
+      "f1_score": 0.751,
+      "samples": "134,189",
+      "size": "182.3 MB",
+      "download_url": "../build/simple/archived/cwe_model_018_20250604_123652.pkl",
       "model_available": true
     }
   ]
