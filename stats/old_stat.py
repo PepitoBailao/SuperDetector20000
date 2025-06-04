@@ -44,10 +44,10 @@ def archive_current_stats():
             shutil.copy2(current_model_path, archive_model_path)
         
         generate_archives_index()
-        
         return archive_stats_path
         
-    except:
+    except Exception as e:
+        print(f"Archive failed: {e}")
         return None
 
 def list_archived_stats():
@@ -59,12 +59,10 @@ def list_archived_stats():
             return []
         
         archives = []
-        for file_path in sorted(glob.glob(os.path.join(archives_dir, "model_statistics_*.json"))):
+        for file_path in sorted(glob.glob(os.path.join(archives_dir, "model_statistics_*.json")), reverse=True):
             try:
                 with open(file_path, 'r') as f:
                     stats = json.load(f)
-                
-                file_size = os.path.getsize(file_path)
                 
                 model_file_name = stats.get('model_file_name')
                 if not model_file_name:
@@ -80,15 +78,16 @@ def list_archived_stats():
                     'archive_number': stats.get('archive_number', 0),
                     'accuracy': stats.get('performance', {}).get('accuracy', 0),
                     'f1_score': stats.get('performance', {}).get('f1_score', 0),
-                    'total_samples': stats.get('dataset', {}).get('total_samples', 0),
-                    'file_size_kb': round(file_size / 1024, 1)
+                    'total_samples': stats.get('dataset', {}).get('total_samples', 0)
                 })
-            except:
+            except Exception as e:
+                print(f"Error reading archive {file_path}: {e}")
                 continue
         
         return archives
         
-    except:
+    except Exception as e:
+        print(f"List archives failed: {e}")
         return []
 
 def generate_archives_index():
@@ -104,12 +103,20 @@ def generate_archives_index():
             if model_exists:
                 model_size = round(os.path.getsize(model_path) / (1024 * 1024), 1)
             
+            # Extraire la date du nom de fichier ou utiliser archived_at
+            generated_date = "Unknown"
+            if archive['generated_at'] != 'Unknown':
+                try:
+                    generated_date = archive['generated_at'][:10]
+                except:
+                    pass
+            
             web_archives.append({
                 'name': archive['model_file_name'].replace('.pkl', ''),
-                'generated_date': archive['generated_at'][:10] if archive['generated_at'] != 'Unknown' else 'Unknown',
+                'generated_date': generated_date,
                 'archived_date': archive['archived_at'][:10] if archive['archived_at'] != 'Unknown' else 'Unknown',
                 'accuracy': f"{archive['accuracy']}%",
-                'f1_score': archive['f1_score'],
+                'f1_score': float(archive['f1_score']),
                 'samples': f"{archive['total_samples']:,}",
                 'size': f"{model_size} MB" if model_exists else "N/A",
                 'download_url': f"../build/simple/archived/{archive['model_file_name']}",
@@ -126,7 +133,8 @@ def generate_archives_index():
         
         return index_path
         
-    except:
+    except Exception as e:
+        print(f"Generate index failed: {e}")
         return None
 
 def cleanup_old_archives(keep_last_n=10):
@@ -137,26 +145,21 @@ def cleanup_old_archives(keep_last_n=10):
             return
         
         archives.sort(key=lambda x: x['archive_number'])
-        
         to_delete = archives[:-keep_last_n]
-        deleted_count = 0
         
         for archive in to_delete:
             try:
                 os.remove(archive['file_path'])
-                
                 model_path = os.path.join(base_dir, "build/simple/archived", archive['model_file_name'])
                 if os.path.exists(model_path):
                     os.remove(model_path)
-                
-                deleted_count += 1
-            except:
-                continue
+            except Exception as e:
+                print(f"Failed to delete {archive['file_name']}: {e}")
         
         generate_archives_index()
         
-    except:
-        pass
+    except Exception as e:
+        print(f"Cleanup failed: {e}")
 
 def update_old_stat_page():
     try:
@@ -170,7 +173,8 @@ if __name__ == "__main__":
         command = sys.argv[1]
         
         if command == "archive":
-            archive_current_stats()
+            result = archive_current_stats()
+            print(f"Archived: {result}")
         elif command == "list":
             archives = list_archived_stats()
             for a in archives:
@@ -178,9 +182,14 @@ if __name__ == "__main__":
                                                                   "build/simple/archived", a['model_file_name'])) else "✗"
                 print(f"{a['model_file_name']} {model_status} - {a['accuracy']}% - {a['generated_at'][:10]}")
         elif command == "index":
-            generate_archives_index()
+            result = generate_archives_index()
+            print(f"Index generated: {result}")
         elif command == "update":
-            update_old_stat_page()
+            result = update_old_stat_page()
+            print(f"Page updated: {result}")
         elif command == "cleanup":
             keep_n = int(sys.argv[2]) if len(sys.argv) > 2 else 10
             cleanup_old_archives(keep_n)
+            print(f"Cleanup completed, kept last {keep_n} archives")
+    else:
+        print("Usage: python old_stat.py [archive|list|index|update|cleanup]")
