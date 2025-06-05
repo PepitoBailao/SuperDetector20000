@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-06-05T13:00:28.960788",
+  "generated_at": "2025-06-05T10:58:49.105260",
   "dataset": {
     "total_samples": 134195,
     "unique_cwes": 122,
@@ -48,5 +48,8 @@
     "precision": 79.44652234544097,
     "recall": 77.59006211180125,
     "false_positive_rate": 20.553477654559032
-  }
+  },
+  "archived_at": "2025-06-05T12:58:19.752693",
+  "archive_number": 20,
+  "model_file_name": "cwe_model_020_20250605_125819.pkl"
 }
