@@ -5,3 +5,4 @@ stats/__pycache__/
 .venv/
 build/
 test/
+cache/

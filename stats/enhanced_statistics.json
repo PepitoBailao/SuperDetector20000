@@ -1,0 +1,395 @@
+{
+  "generated_at": "2025-06-06T11:46:27.828733",
+  "dataset": {
+    "total_samples": 134272,
+    "unique_cwes": 123,
+    "cwe_distribution": {
+      "CWE89": 21120,
+      "CWE78": 9733,
+      "CWE122": 9650,
+      "CWE121": 7887,
+      "CWE190": 6451,
+      "CWE762": 6104,
+      "CWE91": 5760,
+      "CWE134": 4929,
+      "CWE191": 4727,
+      "CWE590": 4229,
+      "CWE36": 3907,
+      "CWE23": 3907,
+      "CWE127": 3318,
+      "CWE124": 3318,
+      "CWE401": 2710
+    },
+    "most_common_cwe": "CWE89",
+    "avg_code_length": 1550.8550256196377,
+    "min_code_length": 57,
+    "max_code_length": 292370,
+    "sources": [
+      "Juliet Test Suite",
+      "C# Vulnerability Test Suite",
+      "MITRE CWE Examples"
+    ]
+  },
+  "model": {
+    "algorithm": "TF-IDF + Multinomial Naive Bayes",
+    "max_features": 100000,
+    "n_gram_range": "(1, 3)",
+    "train_test_split": "85% / 15%",
+    "model_size_mb": 186.8,
+    "file_types_supported": [
+      ".c",
+      ".cpp",
+      ".cs"
+    ]
+  },
+  "performance": {
+    "accuracy": 77.82798689045586,
+    "f1_score": 0.7547479694744607,
+    "precision": 80.1147077417199,
+    "recall": 77.82798689045586,
+    "false_positive_rate": 19.885292258280103
+  },
+  "enhanced_cwe_details": {
+    "CWE89": {
+      "sample_count": 21120,
+      "name": "CWE-89",
+      "description": "",
+      "parents": [
+        {
+          "Type": "class_weakness",
+          "ID": "943",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": [
+        {
+          "Type": "variant_weakness",
+          "ID": "564",
+          "ViewID": "1000"
+        }
+      ]
+    },
+    "CWE78": {
+      "sample_count": 9733,
+      "name": "CWE-78",
+      "description": "",
+      "parents": [
+        {
+          "Type": "class_weakness",
+          "ID": "77",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": []
+    },
+    "CWE122": {
+      "sample_count": 9650,
+      "name": "CWE-122",
+      "description": "",
+      "parents": [
+        {
+          "Type": "base_weakness",
+          "ID": "787",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "base_weakness",
+          "ID": "788",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": []
+    },
+    "CWE121": {
+      "sample_count": 7887,
+      "name": "CWE-121",
+      "description": "",
+      "parents": [
+        {
+          "Type": "base_weakness",
+          "ID": "787",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "base_weakness",
+          "ID": "788",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": []
+    },
+    "CWE190": {
+      "sample_count": 6451,
+      "name": "CWE-190",
+      "description": "",
+      "parents": [
+        {
+          "Type": "pillar_weakness",
+          "ID": "682",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": [
+        {
+          "Type": "chain_weakness",
+          "ID": "680",
+          "ViewID": "1000"
+        }
+      ]
+    },
+    "CWE762": {
+      "sample_count": 6104,
+      "name": "CWE-762",
+      "description": "",
+      "parents": [
+        {
+          "Type": "base_weakness",
+          "ID": "763",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": [
+        {
+          "Type": "variant_weakness",
+          "ID": "590",
+          "ViewID": "1000"
+        }
+      ]
+    },
+    "CWE91": {
+      "sample_count": 5760,
+      "name": "CWE-91",
+      "description": "",
+      "parents": [
+        {
+          "Type": "class_weakness",
+          "ID": "74",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": [
+        {
+          "Type": "base_weakness",
+          "ID": "643",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "base_weakness",
+          "ID": "652",
+          "ViewID": "1000"
+        }
+      ]
+    },
+    "CWE134": {
+      "sample_count": 4929,
+      "name": "CWE-134",
+      "description": "",
+      "parents": [
+        {
+          "Type": "class_weakness",
+          "ID": "668",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": []
+    },
+    "CWE191": {
+      "sample_count": 4727,
+      "name": "CWE-191",
+      "description": "",
+      "parents": [
+        {
+          "Type": "pillar_weakness",
+          "ID": "682",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": []
+    },
+    "CWE590": {
+      "sample_count": 4229,
+      "name": "CWE-590",
+      "description": "",
+      "parents": [
+        {
+          "Type": "variant_weakness",
+          "ID": "762",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": []
+    },
+    "CWE36": {
+      "sample_count": 3907,
+      "name": "CWE-36",
+      "description": "",
+      "parents": [
+        {
+          "Type": "base_weakness",
+          "ID": "22",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": [
+        {
+          "Type": "variant_weakness",
+          "ID": "37",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "38",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "39",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "40",
+          "ViewID": "1000"
+        }
+      ]
+    },
+    "CWE23": {
+      "sample_count": 3907,
+      "name": "CWE-23",
+      "description": "",
+      "parents": [
+        {
+          "Type": "base_weakness",
+          "ID": "22",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": [
+        {
+          "Type": "variant_weakness",
+          "ID": "24",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "25",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "26",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "27",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "28",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "29",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "30",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "31",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "32",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "33",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "34",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "variant_weakness",
+          "ID": "35",
+          "ViewID": "1000"
+        }
+      ]
+    },
+    "CWE127": {
+      "sample_count": 3318,
+      "name": "CWE-127",
+      "description": "",
+      "parents": [
+        {
+          "Type": "base_weakness",
+          "ID": "125",
+          "ViewID": "1000"
+        },
+        {
+          "Type": "base_weakness",
+          "ID": "786",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": []
+    },
+    "CWE124": {
+      "sample_count": 3318,
+      "name": "CWE-124",
+      "description": "",
+      "parents": [
+        {
+          "Type": "base_weakness",
+          "ID": "786",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        },
+        {
+          "Type": "base_weakness",
+          "ID": "787",
+          "ViewID": "1000"
+        }
+      ],
+      "children": []
+    },
+    "CWE401": {
+      "sample_count": 2710,
+      "name": "CWE-401",
+      "description": "",
+      "parents": [
+        {
+          "Type": "base_weakness",
+          "ID": "772",
+          "ViewID": "1000",
+          "Primary_Parent": true
+        }
+      ],
+      "children": []
+    }
+  }
+}

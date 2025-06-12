@@ -1,15 +1,15 @@
-import os
-import re
+import numpy as np
 import pickle
 import pandas as pd
-import numpy as np
+import os
+import json
+import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix
 from collections import Counter
-import json
 
 class SimpleCWEClassifier:
     def __init__(self, max_features=100000, ngram_range=(1, 3), min_df=2, max_df=0.95):
@@ -177,14 +177,16 @@ class SimpleCWEClassifier:
             
             threshold = self.confidence_thresholds.get(predicted_cwe, 0.5)
             
+            # Check if the primary prediction meets the threshold
             if adjusted_confidence >= threshold:
                 final_predictions.append(predicted_cwe)
                 confidences.append(adjusted_confidence)
             else:
+                # Look for alternatives if primary prediction doesn't meet threshold
                 sorted_indices = np.argsort(y_pred_proba[i])[::-1]
                 
                 found_alternative = False
-                for idx in sorted_indices[1:3]:
+                for idx in sorted_indices[1:3]:  # Check top 2 alternatives
                     alt_cwe = self.pipeline.classes_[idx]
                     alt_confidence = y_pred_proba[i][idx]
                     alt_adjusted = self._validate_with_patterns(code, alt_cwe, alt_confidence)

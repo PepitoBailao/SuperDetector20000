@@ -1,7 +1,51 @@
 {
-  "generated_at": "2025-06-05T12:58:34.761321",
-  "total_archives": 20,
+  "generated_at": "2025-06-06T11:45:13.306844",
+  "total_archives": 24,
   "archives": [
+    {
+      "name": "cwe_model_024_20250606_114513",
+      "generated_date": "2025-06-06",
+      "archived_date": "2025-06-06",
+      "accuracy": "77.82798689045586%",
+      "f1_score": 0.7547479694744607,
+      "samples": "134,272",
+      "size": "186.8 MB",
+      "download_url": "../build/simple/archived/cwe_model_024_20250606_114513.pkl",
+      "model_available": true
+    },
+    {
+      "name": "cwe_model_023_20250606_112530",
+      "generated_date": "2025-06-06",
+      "archived_date": "2025-06-06",
+      "accuracy": "77.82798689045586%",
+      "f1_score": 0.7547479694744607,
+      "samples": "134,272",
+      "size": "186.8 MB",
+      "download_url": "../build/simple/archived/cwe_model_023_20250606_112530.pkl",
+      "model_available": true
+    },
+    {
+      "name": "cwe_model_022_20250606_104119",
+      "generated_date": "2025-06-05",
+      "archived_date": "2025-06-06",
+      "accuracy": "77.59006211180125%",
+      "f1_score": 0.751687737397897,
+      "samples": "134,195",
+      "size": "182.3 MB",
+      "download_url": "../build/simple/archived/cwe_model_022_20250606_104119.pkl",
+      "model_available": true
+    },
+    {
+      "name": "cwe_model_021_20250606_104110",
+      "generated_date": "2025-06-05",
+      "archived_date": "2025-06-06",
+      "accuracy": "77.59006211180125%",
+      "f1_score": 0.751687737397897,
+      "samples": "134,195",
+      "size": "182.3 MB",
+      "download_url": "../build/simple/archived/cwe_model_021_20250606_104110.pkl",
+      "model_available": true
+    },
     {
       "name": "cwe_model_020_20250605_125819",
       "generated_date": "2025-06-05",
