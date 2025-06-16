@@ -5,7 +5,6 @@ import json
 from bs4 import BeautifulSoup
 
 def clean_code(code):
-    """Clean code by removing comments and normalizing whitespace"""
     code = re.sub(r'/\*.*?\*/', '', code, flags=re.DOTALL)
     code = re.sub(r'//.*', '', code)
     code = re.sub(r'///.*', '', code)

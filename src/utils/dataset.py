@@ -5,7 +5,6 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-# URLs for external datasets
 JULIET_URL = (
     "https://samate.nist.gov/SARD/downloads/"
     "test-suites/2017-10-01-juliet-test-suite-for-c-cplusplus-v1-3.zip"
@@ -25,7 +24,6 @@ CWE_URLS = {
 }
 
 def download_and_extract(url, base_dir, zip_name, extract_dir):
-    """Download and extract a zip file"""
     os.makedirs(base_dir, exist_ok=True)
     zip_path = os.path.join(base_dir, zip_name)
     extract_path = os.path.join(base_dir, extract_dir)
@@ -39,24 +37,21 @@ def download_and_extract(url, base_dir, zip_name, extract_dir):
             zf.extractall(extract_path)
         
         os.remove(zip_path)
-        print(f"✓ {zip_name} downloaded and extracted")
+        print(f"Downloaded and extracted {zip_name}")
     else:
-        print(f"✓ {extract_dir} already exists")
+        print(f"{extract_dir} already exists")
     
     return extract_path
 
 def download_juliet_dataset():
-    """Download Juliet Test Suite"""
     print("Downloading Juliet Test Suite...")
     return download_and_extract(JULIET_URL, "datasets/juliet", "juliet.zip", "extracted")
 
 def download_csharp_dataset():
-    """Download C# Vulnerability Test Suite"""
     print("Downloading C# Vulnerability Test Suite...")
     return download_and_extract(CSHARP_URL, "datasets/csharp", "csharp.zip", "extracted")
 
 def scrape_cwe_pages():
-    """Scrape CWE pages from MITRE website"""
     print("Scraping CWE pages from MITRE...")
     
     scraped_dir = "datasets/web_scraped"
@@ -66,7 +61,7 @@ def scrape_cwe_pages():
         output_file = os.path.join(scraped_dir, f"{cwe_id}.html")
         
         if os.path.exists(output_file):
-            print(f"✓ {cwe_id} already scraped")
+            print(f"{cwe_id} already scraped")
             continue
         
         try:
@@ -77,16 +72,18 @@ def scrape_cwe_pages():
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(response.text)
             
-            print(f"✓ {cwe_id} scraped successfully")
+            print(f"{cwe_id} scraped successfully")
             
         except Exception as e:
-            print(f"✗ Failed to scrape {cwe_id}: {e}")
+            print(f"Failed to scrape {cwe_id}: {e}")
     
     print("CWE scraping completed")
 
+def download_datasets():
+    download_all_datasets()
+
 def download_all_datasets():
-    """Download all external datasets"""
-    print("=== Downloading All Datasets ===")
+    print("Downloading All Datasets")
     
     try:
         download_juliet_dataset()
@@ -103,7 +100,7 @@ def download_all_datasets():
     except Exception as e:
         print(f"Web scraping failed: {e}")
     
-    print("=== Dataset Download Complete ===")
+    print("Dataset Download Complete")
 
 if __name__ == "__main__":
     download_all_datasets()

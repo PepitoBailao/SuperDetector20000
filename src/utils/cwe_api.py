@@ -405,15 +405,11 @@ def update_cwe_database(fast_mode: bool = True):
 def get_cwe_info(cwe_id: int) -> Dict:
     """Get CWE information from local database or API fallback"""
     db_path = "cache/cwe_database.json"
-    
-    # Try local database first
     if os.path.exists(db_path):
         try:
             with open(db_path, 'r', encoding='utf-8') as f:
                 db = json.load(f)
                 cwes = db.get('cwes', {})
-                
-                # Try both string and int keys
                 for key in [str(cwe_id), cwe_id]:
                     if key in cwes:
                         return cwes[key]

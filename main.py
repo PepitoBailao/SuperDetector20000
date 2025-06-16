@@ -1,311 +1,416 @@
 import os
 import sys
 
+# Add project root and module paths to sys.path
+project_root = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, project_root)
+sys.path.insert(0, os.path.join(project_root, 'src'))
+sys.path.insert(0, os.path.join(project_root, 'src', 'simple'))
+sys.path.insert(0, os.path.join(project_root, 'src', 'utils'))
+
 def ensure_directories():
-    dirs = [
-        "src/simple",
-        "src/utils", 
-        "build/simple",
-        "cache",
-        "datasets",
-        "stats"
-    ]
+    dirs = ["datasets", "build/simple", "cache", "src/simple", "src/utils"]
     for dir_path in dirs:
         os.makedirs(dir_path, exist_ok=True)
 
-def setup_cwe_api():
-    print("[1/5] Setting up CWE API database...")
-    while True:
-        choice = input("Use CWE API? (y/n/skip): ").strip().lower()
-        if choice in ['y', 'yes']:
-            break
-        elif choice in ['n', 'no', 'skip']:
-            print("⚠ Skipping CWE API setup")
-            print("  Training will use only external datasets...")
-            return True
-        else:
-            print("Please enter 'y', 'n', or 'skip'")
+def safe_import(module_name, module_path=None):
+    """Safely import a module with fallback paths"""
+    if module_path:
+        old_path = sys.path.copy()
+        sys.path.insert(0, module_path)
+    
     try:
-        from src.utils.cwe_api import update_cwe_database
-        update_cwe_database()
-        print("✓ CWE API database updated successfully")
+        return __import__(module_name)
+    except ImportError as e:
+        print(f"Failed to import {module_name}: {e}")
+        return None
+    finally:
+        if module_path:
+            sys.path = old_path
+
+def setup_cwe_api():
+    print("[1/5] Setting up CWE API...")
+    choice = input("Use CWE API? (y/n): ").strip().lower()
+    if choice in ['n', 'no']:
+        print("Skipping CWE API")
+        return True
+    
+    cwe_api = None
+    
+    try:
+        import CWE_api as cwe_api
+    except ImportError:
+        try:
+            cwe_api = safe_import('CWE_api', 'src/utils')
+        except:
+            pass
+    
+    if cwe_api is None:
+        print("CWE API module not found, skipping")
+        return True
+    
+    try:
+        if hasattr(cwe_api, 'update_cwe_database'):
+            cwe_api.update_cwe_database(fast_mode=True)
+        elif hasattr(cwe_api, 'fetch_cwe_data'):
+            cwe_api.fetch_cwe_data()
+        else:
+            print("CWE API function not found")
+            return True
+        
+        print("CWE API complete")
         return True
     except Exception as e:
-        print(f"⚠ CWE API setup failed: {e}")
-        
-        # Proposer de continuer sans l'API
-        while True:
-            choice = input("Continue without API? (y/n): ").strip().lower()
-            if choice in ['y', 'yes']:
-                print("  Continuing without API data...")
-                return True
-            elif choice in ['n', 'no']:
-                print("  Aborting setup...")
-                return False
-            else:
-                print("Please enter 'y' or 'n'")
+        print(f"CWE API failed: {e}")
+        return True
 
 def download_datasets():
-    """Download external datasets"""
     print("[2/5] Downloading datasets...")
+    
+    dataset = None
+    
     try:
-        from src.utils.dataset import download_all_datasets
-        download_all_datasets()
-        print("✓ Datasets downloaded successfully")
+        import dataset
+    except ImportError:
+        try:
+            dataset = safe_import('dataset', 'src/utils')
+        except:
+            pass
+    
+    if dataset is None:
+        print("Dataset module not found")
+        return False
+    
+    try:
+        if hasattr(dataset, 'download_all_datasets'):
+            dataset.download_all_datasets()
+        elif hasattr(dataset, 'download_datasets'):
+            dataset.download_datasets()
+        else:
+            print("Download function not found")
+            return False
+        
+        print("Download complete")
         return True
     except Exception as e:
-        print(f"✗ Dataset download failed: {e}")
+        print(f"Download failed: {e}")
         return False
 
 def parse_datasets():
-    """Parse all datasets into unified CSV"""
     print("[3/5] Parsing datasets...")
+    
+    parser = None
+    
     try:
-        from src.utils.parser import create_dataset_csv
-        csv_path = create_dataset_csv()
-        print(f"✓ Dataset CSV created: {csv_path}")
+        import parser
+    except ImportError:
+        try:
+            parser = safe_import('parser', 'src/utils')
+        except:
+            pass
+    
+    if parser is None:
+        print("Parser module not found")
+        return False
+    
+    try:
+        if hasattr(parser, 'extract_files'):
+            parser.extract_files()
+        if hasattr(parser, 'process_datasets'):
+            parser.process_datasets()
+        elif hasattr(parser, 'create_dataset_csv'):
+            parser.create_dataset_csv()
+        else:
+            print("Parser functions not found")
+            return False
+        
+        print("Parsing complete")
         return True
     except Exception as e:
-        print(f"✗ Dataset parsing failed: {e}")
+        print(f"Parsing failed: {e}")
         return False
 
 def train_model():
-    """Train the CWE classification model"""
     print("[4/5] Training model...")
+    
+    train = None
+    
     try:
-        from src.simple.train import train_model_from_csv
-        model = train_model_from_csv()
-        print("✓ Model trained successfully")
+        import train
+    except ImportError:
+        try:
+            train = safe_import('train', 'src/simple')
+        except:
+            pass
+    
+    if train is None:
+        print("Train module not found")
+        return False
+    
+    try:
+        if hasattr(train, 'train_model_from_csv'):
+            train.train_model_from_csv()
+        elif hasattr(train, 'train_model'):
+            train.train_model()
+        else:
+            print("Train function not found")
+            return False
+        
+        print("Training complete")
         return True
     except Exception as e:
-        print(f"✗ Model training failed: {e}")
+        print(f"Training failed: {e}")
         return False
 
 def validate_model():
-    """Validate the trained model"""
     print("[5/5] Validating model...")
+    
+    detect = None
+    
     try:
-        from src.simple.detect import detect_cwe_in_code
+        import detect
+    except ImportError:
+        try:
+            detect = safe_import('detect', 'src/simple')
+        except:
+            pass
+    
+    if detect is None:
+        print("Detect module not found")
+        return False
+    
+    try:
+        test_code = "char buf[10]; strcpy(buf, input);"
         
-        test_codes = [
-            "int main() { return 0; }",
-            "char buf[10]; strcpy(buf, user_input);",
-            "if (password == stored_password) { authenticate(); }"
-        ]
+        if hasattr(detect, 'detect_cwe_in_code'):
+            result = detect.detect_cwe_in_code(test_code)
+            if isinstance(result, dict):
+                print(f"Test result: {result.get('primary_prediction', 'Unknown')}")
+            else:
+                print(f"Test result: {result}")
+        elif hasattr(detect, 'analyze_code'):
+            result = detect.analyze_code(test_code)
+            print(f"Test result: {result}")
+        else:
+            print("Detect function not found")
+            return False
         
-        for i, code in enumerate(test_codes):
-            result = detect_cwe_in_code(code)
-            print(f"  Test {i+1}: {result['primary_prediction']} ({result['primary_confidence']:.1%})")
-        
-        print("✓ Model validation successful")
+        print("Validation complete")
         return True
     except Exception as e:
-        print(f"✗ Model validation failed: {e}")
+        print(f"Validation failed: {e}")
         return False
 
 def quick_setup():
-    """Quick setup without API"""
-    print("=== SuperDetector20000 Quick Setup (No API) ===")
-    
-    steps = [
-        download_datasets,
-        parse_datasets,
-        train_model,
-        validate_model
-    ]
-    
+    print("=== Quick Setup ===")
+    steps = [download_datasets, parse_datasets, train_model, validate_model]
     for step in steps:
         if not step():
-            print("Quick setup pipeline failed")
             return False
-    
-    print("\n✓ Quick setup completed successfully!")
+    print("Setup complete")
     return True
 
 def full_setup():
-    """Run the complete setup pipeline"""
-    print("=== SuperDetector20000 Full Setup ===")
-    
-    steps = [
-        setup_cwe_api,
-        download_datasets,
-        parse_datasets,
-        train_model,
-        validate_model
-    ]
-    
+    print("=== Full Setup ===")
+    steps = [setup_cwe_api, download_datasets, parse_datasets, train_model, validate_model]
     for step in steps:
         if not step():
-            print("Setup pipeline failed")
             return False
-    
-    print("\n✓ Full setup completed successfully!")
+    print("Setup complete")
     return True
 
 def test_file():
-    """Test a file for CWE detection"""
-    print("--- Test File ---")
     file_path = input("File path: ").strip()
-    if not file_path:
+    if not os.path.exists(file_path):
+        print("File not found")
+        return
+    
+    detect = None
+    
+    try:
+        import detect
+    except ImportError:
+        try:
+            detect = safe_import('detect', 'src/simple')
+        except:
+            pass
+    
+    if detect is None:
+        print("Detect module not found")
         return
     
     try:
-        from src.simple.detect import detect_cwe_in_file, print_detection_results
-        result = detect_cwe_in_file(file_path)
-        print_detection_results(result)
+        with open(file_path, 'r', encoding='utf-8') as f:
+            code = f.read()
         
-        # Show CWE details
-        show_cwe_details(result['primary_prediction'])
+        if hasattr(detect, 'detect_cwe_in_file'):
+            result = detect.detect_cwe_in_file(file_path)
+        elif hasattr(detect, 'detect_cwe_in_code'):
+            result = detect.detect_cwe_in_code(code)
+        elif hasattr(detect, 'analyze_code'):
+            result = detect.analyze_code(code)
+        else:
+            print("No detection function found")
+            return
         
+        if isinstance(result, dict):
+            prediction = result.get('primary_prediction', 'Unknown')
+            confidence = result.get('primary_confidence', 0)
+            print(f"Result: {prediction} ({confidence:.1%})")
+        else:
+            print(f"Result: {result}")
+            
     except Exception as e:
         print(f"Error: {e}")
 
 def test_code():
-    """Test code snippet for CWE detection"""
-    print("--- Test Code Snippet ---")
-    print("Paste code (type 'END' to finish):")
+    print("Enter code (type END to finish):")
     lines = []
-    
     while True:
         try:
             line = input()
-            if line.strip().upper() == "END":
+            if line.strip() == "END":
                 break
             lines.append(line)
-        except EOFError:
+        except:
             break
     
     if not lines:
         return
     
+    detect = None
+    
     try:
-        from src.simple.detect import detect_cwe_in_code, print_detection_results
-        result = detect_cwe_in_code("\n".join(lines))
-        print_detection_results(result)
+        import detect
+    except ImportError:
+        try:
+            detect = safe_import('detect', 'src/simple')
+        except:
+            pass
+    
+    if detect is None:
+        print("Detect module not found")
+        return
+    
+    try:
+        code = "\n".join(lines)
         
-        # Show CWE details
-        show_cwe_details(result['primary_prediction'])
+        if hasattr(detect, 'detect_cwe_in_code'):
+            result = detect.detect_cwe_in_code(code)
+        elif hasattr(detect, 'analyze_code'):
+            result = detect.analyze_code(code)
+        else:
+            print("No detection function found")
+            return
         
+        if isinstance(result, dict):
+            prediction = result.get('primary_prediction', 'Unknown')
+            confidence = result.get('primary_confidence', 0)
+            print(f"Result: {prediction} ({confidence:.1%})")
+        else:
+            print(f"Result: {result}")
+            
     except Exception as e:
         print(f"Error: {e}")
 
-def show_cwe_details(cwe_name):
-    """Show detailed CWE information"""
-    try:
-        if cwe_name == "Unknown" or not cwe_name.startswith('CWE'):
-            print(f"\n--- {cwe_name} Details ---")
-            print("No CWE details available for this prediction")
-            return
-            
-        from src.utils.cwe_api import get_cwe_info
-        cwe_id = int(cwe_name.replace('CWE', ''))
-        cwe_info = get_cwe_info(cwe_id)
-        
-        print(f"\n--- {cwe_name} Details ---")
-        print(f"Name: {cwe_info.get('name', 'Unknown')}")
-        
-        description = cwe_info.get('description', 'No description available')
-        if len(description) > 200:
-            description = description[:200] + "..."
-        print(f"Description: {description}")
-        
-    except Exception as e:
-        print(f"Could not fetch CWE details: {e}")
-
 def clean_project():
-    print("--- Clean Project ---")
+    nettoyeur = None
+    
+    # Try different import methods for nettoyeur_de_dossier
     try:
-        from src.utils.nettoyeur_de_dossier import clean_all
-        clean_all()
-        print("✓ Project cleaned successfully")
-    except Exception as e:
-        print(f"✗ Cleanup failed: {e}")
-
-def detection_menu():
-    """Detection menu"""
-    model_path = "build/simple/cwe_model_latest.pkl"
-    if not os.path.exists(model_path):
-        print("No model found. Run setup first.")
+        import nettoyeur_de_dossier
+        nettoyeur = nettoyeur_de_dossier
+    except ImportError:
+        try:
+            nettoyeur = safe_import('nettoyeur_de_dossier', 'src/utils')
+        except:
+            pass
+    
+    if nettoyeur is None:
+        print("Cleaner module not found")
+        # Fallback manual cleanup
+        try:
+            import shutil
+            dirs_to_clean = ["datasets", "build", "cache"]
+            for dir_name in dirs_to_clean:
+                if os.path.exists(dir_name):
+                    shutil.rmtree(dir_name)
+                    print(f"Removed {dir_name}")
+            files_to_clean = ["dataset.csv", "cwe_model.pkl", "vectorizer.pkl"]
+            for file_name in files_to_clean:
+                if os.path.exists(file_name):
+                    os.remove(file_name)
+                    print(f"Removed {file_name}")
+            print("Manual cleanup completed")
+        except Exception as e:
+            print(f"Manual cleanup failed: {e}")
         return
     
-    print("\n=== CWE Detection Menu ===")
+    try:
+        if hasattr(nettoyeur, 'clean_all'):
+            nettoyeur.clean_all()
+        elif hasattr(nettoyeur, 'clean_folder'):
+            nettoyeur.clean_folder()
+        else:
+            print("Clean function not found")
+            return
+        
+        print("Cleaned")
+    except Exception as e:
+        print(f"Clean failed: {e}")
+
+def detection_menu():
+    model_paths = [
+        "build/simple/cwe_model_latest.pkl",
+        "cwe_model.pkl",
+        "src/simple/cwe_model.pkl"
+    ]
+    
+    model_exists = any(os.path.exists(path) for path in model_paths)
+    
+    if not model_exists:
+        print("No model found")
+        return
     
     while True:
-        print("\nOptions:")
-        print("1. Test file")
-        print("2. Test code snippet")
+        print("\n1. Test file")
+        print("2. Test code")
         print("3. Exit")
-        
-        try:
-            choice = input("\nChoice: ").strip()
-            
-            if choice == "1":
-                test_file()
-            elif choice == "2":
-                test_code()
-            elif choice == "3":
-                break
-            else:
-                print("Invalid choice")
-                
-        except KeyboardInterrupt:
-            print("\nExiting...")
+        choice = input("Choice: ").strip()
+        if choice == "1":
+            test_file()
+        elif choice == "2":
+            test_code()
+        elif choice == "3":
             break
 
 def main():
-    """Main application entry point"""
     print("=== SuperDetector20000 ===")
-
     ensure_directories()
     
     while True:
-        print("\nChoose mode:")
-        print("1. Full setup (API + datasets + training)")
-        print("2. Quick setup (datasets only + training)")
-        print("3. Test existing model")
-        print("4. Clean project")
+        print("\n1. Full setup")
+        print("2. Quick setup")
+        print("3. Test model")
+        print("4. Clean")
         print("5. Exit")
         
-        try:
-            choice = input("\nChoice (1-5): ").strip()
-            
-            if choice == "1":
-                if full_setup():
-                    answer = input("\nStart detection menu? (y/n): ")
-                    if answer.lower() == 'y':
-                        detection_menu()
-                break
-                
-            elif choice == "2":
-                if quick_setup():
-                    answer = input("\nStart detection menu? (y/n): ")
-                    if answer.lower() == 'y':
-                        detection_menu()
-                break
-                
-            elif choice == "3":
+        choice = input("Choice: ").strip()
+        
+        if choice == "1":
+            if full_setup():
                 detection_menu()
-                break
-                
-            elif choice == "4":
-                clean_project()
-                
-            elif choice == "5":
-                print("Exiting...")
-                break
-                
-            else:
-                print("Invalid choice. Please enter 1-5.")
-                
-        except KeyboardInterrupt:
-            print("\nExiting...")
+            break
+        elif choice == "2":
+            if quick_setup():
+                detection_menu()
+            break
+        elif choice == "3":
+            detection_menu()
+        elif choice == "4":
+            clean_project()
+        elif choice == "5":
             break
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\nStopped")
-    except Exception as e:
-        print(f"Error: {e}")
-        sys.exit(1)
+    main()
