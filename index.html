@@ -243,23 +243,23 @@
         setupSearch();
     }
 
-    function updateMetrics() {
+        function updateMetrics() {
         const metrics = document.getElementById('metrics');
         metrics.innerHTML = `
             <div class="metric">
-                <div class="metric-value">${data.performance.accuracy}%</div>
+                <div class="metric-value">${data.performance.accuracy.toFixed(2)}%</div>
                 <div class="metric-label">Accuracy</div>
             </div>
             <div class="metric">
-                <div class="metric-value">${data.performance.f1_score}</div>
+                <div class="metric-value">${data.performance.f1_score.toFixed(2)}</div>
                 <div class="metric-label">F1-Score</div>
             </div>
             <div class="metric">
-                <div class="metric-value">${data.performance.precision}%</div>
+                <div class="metric-value">${data.performance.precision.toFixed(2)}%</div>
                 <div class="metric-label">Precision</div>
             </div>
             <div class="metric">
-                <div class="metric-value">${data.performance.recall}%</div>
+                <div class="metric-value">${data.performance.recall.toFixed(2)}%</div>
                 <div class="metric-label">Recall</div>
             </div>
         `;
